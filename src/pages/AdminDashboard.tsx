@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { checkEnvironmentVariables, testSupabaseConnection, testGeminiConnection } from "@/utils/testKeys";
-import { useFeedbackSystem } from "@/hooks/useFeedbackSystem";
+import { useFeedback } from "@/contexts/FeedbackContext";
 import { useMemberSystem } from "@/hooks/useMemberSystem";
 import { useCheckInSystem } from "@/hooks/useCheckInSystem";
 import { Link } from "react-router-dom";
@@ -22,7 +22,7 @@ const AdminDashboard = () => {
     markAsReviewed, 
     markAsResolved, 
     getFeedbackStats 
-  } = useFeedbackSystem();
+  } = useFeedback();
   
   const { getMemberStats } = useMemberSystem();
   const { crowdStats } = useCheckInSystem();

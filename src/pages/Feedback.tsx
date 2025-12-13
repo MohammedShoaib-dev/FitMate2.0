@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useFeedback } from "@/contexts/FeedbackContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const Feedback = () => {
@@ -19,14 +21,16 @@ const Feedback = () => {
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
   const { toast } = useToast();
+  const { addFeedback } = useFeedback();
+  const { user } = useAuth();
 
   const categories = [
-    { value: "equipment", label: "Equipment" },
-    { value: "cleanliness", label: "Cleanliness" },
-    { value: "staff", label: "Staff" },
-    { value: "facility", label: "Facility" },
-    { value: "classes", label: "Classes" },
-    { value: "other", label: "Other" },
+    { value: "Equipment", label: "Equipment" },
+    { value: "Facility", label: "Facility" },
+    { value: "Service", label: "Service" },
+    { value: "Classes", label: "Classes" },
+    { value: "Amenities", label: "Amenities" },
+    { value: "Other", label: "Other" },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,6 +62,19 @@ const Feedback = () => {
       });
       return;
     }
+
+    // Add feedback to the system
+    const newFeedback = {
+      userId: user?.id || "GUEST",
+      userName: user?.name || "Guest User",
+      date: new Date().toLocaleDateString(),
+      comment: message,
+      rating: rating,
+      category: category,
+      status: "pending" as const
+    };
+
+    addFeedback(newFeedback);
 
     toast({
       title: "Feedback Submitted! 🙏",
