@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 export interface Feedback {
   id: string;
@@ -27,7 +27,7 @@ export interface FeedbackStats {
 
 interface FeedbackContextType {
   feedbacks: Feedback[];
-  addFeedback: (feedback: Omit<Feedback, 'id' | 'createdAt'>) => Feedback;
+  addFeedback: (feedback: Omit<Feedback, 'id' | 'createdAt'>) => void;
   markAsReviewed: (feedbackId: string, adminNotes?: string) => void;
   markAsResolved: (feedbackId: string, adminNotes?: string) => void;
   getFeedbackStats: () => FeedbackStats;
@@ -133,8 +133,14 @@ const DEMO_FEEDBACK: Feedback[] = [
   }
 ];
 
-export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(DEMO_FEEDBACK);
+  
+  // Debug effect to track feedback changes
+  React.useEffect(() => {
+    console.log('📊 FeedbackContext - Feedbacks updated:', feedbacks.length);
+    console.log('📊 Latest feedback:', feedbacks[0]?.userName, feedbacks[0]?.comment?.substring(0, 50));
+  }, [feedbacks]);
 
   const addFeedback = useCallback((newFeedback: Omit<Feedback, 'id' | 'createdAt'>) => {
     const feedback: Feedback = {
@@ -143,7 +149,7 @@ export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }
       createdAt: new Date()
     };
     setFeedbacks(prev => [feedback, ...prev]);
-    console.log('✅ New feedback added:', feedback);
+    console.log('✅ New feedback added to global context:', feedback);
     return feedback;
   }, []);
 

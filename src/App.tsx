@@ -27,9 +27,9 @@ const App = () => (
     <AuthProvider>
       <FeedbackProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<RoleSelection />} />
@@ -117,7 +117,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </FeedbackProvider>
+      </FeedbackProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

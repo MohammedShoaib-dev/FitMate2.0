@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useFeedback } from "@/contexts/FeedbackContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFeedback } from "@/contexts/FeedbackContext";
 import { cn } from "@/lib/utils";
 
 const Feedback = () => {
@@ -21,8 +21,8 @@ const Feedback = () => {
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
   const { toast } = useToast();
-  const { addFeedback } = useFeedback();
   const { user } = useAuth();
+  const { addFeedback } = useFeedback();
 
   const categories = [
     { value: "Equipment", label: "Equipment" },
@@ -63,22 +63,24 @@ const Feedback = () => {
       return;
     }
 
-    // Add feedback to the system
+    // Save feedback to the global context
     const newFeedback = {
       userId: user?.id || "GUEST",
-      userName: user?.name || "Guest User",
+      userName: user?.name || "Anonymous User",
       date: new Date().toLocaleDateString(),
       comment: message,
       rating: rating,
       category: category,
-      status: "pending" as const
+      status: 'pending' as const
     };
 
+    console.log('🔄 Submitting feedback:', newFeedback);
     addFeedback(newFeedback);
+    console.log('✅ Feedback submitted to context');
 
     toast({
       title: "Feedback Submitted! 🙏",
-      description: "Thank you for helping us improve. We'll review your feedback shortly.",
+      description: "Thank you for helping us improve. We'll review your feedback shortly and it will appear in the admin dashboard.",
     });
 
     // Reset form
@@ -165,10 +167,36 @@ const Feedback = () => {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full" size="lg">
-            <MessageSquare className="w-5 h-5 mr-2" />
-            Submit Feedback
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" className="flex-1" size="lg">
+              <MessageSquare className="w-5 h-5 mr-2" />
+              Submit Feedback
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                console.log('🧪 Testing context connection...');
+                const testFeedback = {
+                  userId: "TEST001",
+                  userName: "Test User",
+                  date: new Date().toLocaleDateString(),
+                  comment: "This is a test feedback to verify the context is working properly.",
+                  rating: 5,
+                  category: "Equipment",
+                  status: 'pending' as const
+                };
+                addFeedback(testFeedback);
+                toast({
+                  title: "Test Feedback Added",
+                  description: "Check the admin dashboard to see if it appears.",
+                });
+              }}
+            >
+              Test
+            </Button>
+          </div>
         </form>
       </div>
     </AppLayout>
