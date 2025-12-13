@@ -144,38 +144,247 @@ export const testGeminiAPI = async () => {
 const getSmartFitnessResponse = (prompt: string): string => {
   const lowerPrompt = prompt.toLowerCase();
   
-  // Workout related
-  if (lowerPrompt.includes('workout') || lowerPrompt.includes('exercise')) {
-    return "Great question about workouts! Here's my advice: Start with compound movements like squats, deadlifts, and push-ups. Aim for 3-4 sets of 8-12 reps. Remember to warm up for 5-10 minutes before exercising and cool down afterward. Progressive overload is key - gradually increase weight or reps each week! 💪";
+  // Workout plan creation
+  if (lowerPrompt.includes('workout plan') || lowerPrompt.includes('create workout') || lowerPrompt.includes('training plan')) {
+    return `**Custom Workout Plan for You:**
+
+**Week 1-2: Foundation Building**
+• Day 1 (Upper Body): Push-ups 3x8-12, Dumbbell rows 3x8-12, Shoulder press 3x8-10, Plank 3x30sec
+• Day 2 (Lower Body): Bodyweight squats 3x12-15, Lunges 3x10 each leg, Glute bridges 3x12-15, Wall sit 3x30sec
+• Day 3 (Full Body): Burpees 3x5-8, Mountain climbers 3x20, Jumping jacks 3x30sec, Dead bugs 3x10 each side
+
+**Week 3-4: Progressive Overload**
+• Add weight or increase reps by 10-20%
+• Focus on form over speed
+• Rest 48-72 hours between sessions
+
+**Tips:** Warm up 5-10 min, cool down with stretching, stay hydrated!`;
+  }
+
+  // Form improvement
+  if (lowerPrompt.includes('form') || lowerPrompt.includes('technique') || lowerPrompt.includes('improve')) {
+    return `**Perfect Your Exercise Form:**
+
+**Key Principles:**
+• Start Light: Master bodyweight before adding weight
+• Control the Movement: 2 seconds down, 1 second pause, 2 seconds up
+• Full Range of Motion: Complete the entire movement pattern
+• Breathe Properly: Exhale on exertion, inhale on release
+
+**Common Form Fixes:**
+• Squats: Keep chest up, knees track over toes, weight in heels
+• Push-ups: Straight line from head to heels, elbows at 45 degrees
+• Deadlifts: Keep bar close to body, hinge at hips, neutral spine
+
+**Pro Tip:** Record yourself or use mirrors to check form!`;
+  }
+
+  // Abs/core exercises
+  if (lowerPrompt.includes('abs') || lowerPrompt.includes('core') || lowerPrompt.includes('stomach')) {
+    return `**Best Ab Exercises for a Strong Core:**
+
+**Beginner Level:**
+• Plank: 3x30-60sec - Full body stability
+• Dead Bug: 3x10 each side - Core control
+• Glute Bridge: 3x12-15 - Posterior chain
+• Modified Bicycle Crunches: 3x20 total
+
+**Intermediate Level:**
+• Mountain Climbers: 3x30sec - Dynamic core
+• Russian Twists: 3x20 - Obliques
+• Leg Raises: 3x10-12 - Lower abs
+• Side Plank: 3x20-30sec each side
+
+**Advanced Level:**
+• Hanging Leg Raises: 3x8-12
+• Ab Wheel Rollouts: 3x8-10
+• Dragon Flags: 3x5-8
+
+**Remember:** Abs are made in the kitchen! Combine with proper nutrition.`;
+  }
+
+  // Post-workout meals
+  if (lowerPrompt.includes('post-workout') || lowerPrompt.includes('after workout') || lowerPrompt.includes('post workout') || (lowerPrompt.includes('meal') && lowerPrompt.includes('workout'))) {
+    return `**Perfect Post-Workout Meals:**
+
+**Within 30 Minutes (Recovery Window):**
+• Protein Shake: Whey protein + banana + berries
+• Chocolate Milk: Quick carbs + protein (3:1 ratio)
+• Greek Yogurt: With honey and granola
+
+**Full Meals (1-2 Hours Post-Workout):**
+• Muscle Building: Grilled chicken + sweet potato + broccoli
+• Weight Loss: Salmon + quinoa + mixed vegetables
+• Vegetarian: Lentil bowl + brown rice + avocado
+• Quick Option: Tuna sandwich + apple + nuts
+
+**Hydration Goals:**
+• 16-24oz water immediately after
+• Replace 150% of fluid lost through sweat
+• Add electrolytes for workouts over 1 hour
+
+**Timing Matters:** Eat within 2 hours for optimal recovery!`;
+  }
+
+  // General workout questions
+  if (lowerPrompt.includes('workout') || lowerPrompt.includes('exercise') || lowerPrompt.includes('training')) {
+    return `**Smart Workout Strategy:**
+
+**The Big 5 Compound Movements:**
+1. Squats - Legs, glutes, core
+2. Deadlifts - Full posterior chain
+3. Push-ups/Bench Press - Chest, shoulders, triceps
+4. Pull-ups/Rows - Back, biceps
+5. Overhead Press - Shoulders, core
+
+**Weekly Structure:**
+• Frequency: 3-4 days per week
+• Sets: 3-4 per exercise
+• Reps: 8-12 for muscle building, 12-15 for endurance
+• Rest: 48-72 hours between training same muscles
+
+**Progressive Overload:**
+• Week 1-2: Master form
+• Week 3-4: Add weight (5-10%)
+• Week 5-6: Increase reps or sets
+• Week 7-8: Deload (reduce intensity)
+
+**Always:** Warm up 5-10 min, cool down with stretching!`;
   }
   
   // Nutrition related
-  if (lowerPrompt.includes('diet') || lowerPrompt.includes('nutrition') || lowerPrompt.includes('food') || lowerPrompt.includes('eat')) {
-    return "Nutrition is crucial for your fitness goals! Focus on whole foods: lean proteins (chicken, fish, beans), complex carbs (oats, quinoa, sweet potatoes), and healthy fats (avocado, nuts). Stay hydrated with 8+ glasses of water daily. Eat protein within 30 minutes after workouts for optimal recovery! 🥗";
+  if (lowerPrompt.includes('diet') || lowerPrompt.includes('nutrition') || lowerPrompt.includes('food') || lowerPrompt.includes('eat') || lowerPrompt.includes('meal')) {
+    return `**Nutrition for Fitness Success:**
+
+**Macronutrient Breakdown:**
+• Protein: 0.8-1.2g per lb bodyweight (muscle building/recovery)
+• Carbs: 2-3g per lb bodyweight (energy for workouts)
+• Fats: 0.3-0.4g per lb bodyweight (hormone production)
+
+**Best Food Sources:**
+• Proteins: Chicken, fish, eggs, Greek yogurt, beans, quinoa
+• Carbs: Oats, sweet potatoes, brown rice, fruits, vegetables
+• Fats: Avocado, nuts, olive oil, fatty fish
+
+**Meal Timing:**
+• Pre-workout: Light carbs + small protein (1-2 hours before)
+• Post-workout: Protein + carbs within 30 minutes
+• Daily: Eat every 3-4 hours to maintain energy
+
+**Hydration:** 8-10 glasses water daily, more during workouts!`;
   }
   
   // Weight loss
-  if (lowerPrompt.includes('lose weight') || lowerPrompt.includes('fat loss') || lowerPrompt.includes('cutting')) {
-    return "For healthy weight loss: Create a moderate calorie deficit (300-500 calories below maintenance), combine cardio with strength training, prioritize protein (0.8-1g per lb bodyweight), and be patient - aim for 1-2 lbs per week. Consistency beats perfection! 📉";
+  if (lowerPrompt.includes('lose weight') || lowerPrompt.includes('fat loss') || lowerPrompt.includes('cutting') || lowerPrompt.includes('weight loss')) {
+    return `**Effective Weight Loss Strategy:**
+
+**Calorie Management:**
+• Deficit: 300-500 calories below maintenance
+• Track: Use apps like MyFitnessPal for 1-2 weeks
+• Don't Starve: Minimum 1200 calories for women, 1500 for men
+
+**Exercise Combination:**
+• Strength Training: 3x/week (preserves muscle)
+• Cardio: 2-3x/week (burns calories)
+• HIIT: 1-2x/week (efficient fat burning)
+
+**Sustainable Habits:**
+• Meal Prep: Plan and prepare meals in advance
+• Protein Priority: Keeps you full and preserves muscle
+• Sleep: 7-9 hours (affects hunger hormones)
+• Patience: 1-2 lbs per week is healthy and sustainable
+
+**Remember:** It's a marathon, not a sprint!`;
   }
   
   // Muscle building
-  if (lowerPrompt.includes('muscle') || lowerPrompt.includes('bulk') || lowerPrompt.includes('gain')) {
-    return "Building muscle requires: Progressive resistance training 3-4x/week, adequate protein (1-1.2g per lb bodyweight), sufficient calories (slight surplus), and 7-9 hours of sleep for recovery. Focus on compound movements and be patient - muscle growth takes time! 💪";
+  if (lowerPrompt.includes('muscle') || lowerPrompt.includes('bulk') || lowerPrompt.includes('gain') || lowerPrompt.includes('build')) {
+    return `**Muscle Building Blueprint:**
+
+**Training Principles:**
+• Progressive Overload: Gradually increase weight, reps, or sets
+• Frequency: Train each muscle group 2-3x per week
+• Volume: 10-20 sets per muscle group per week
+• Rest: 48-72 hours between training same muscles
+
+**Nutrition for Growth:**
+• Calorie Surplus: 200-500 calories above maintenance
+• Protein: 1-1.2g per lb bodyweight
+• Timing: Protein every 3-4 hours throughout the day
+• Post-Workout: 20-40g protein within 2 hours
+
+**Recovery Essentials:**
+• Sleep: 7-9 hours (muscle growth happens during rest)
+• Hydration: Adequate water for protein synthesis
+• Stress Management: High cortisol inhibits muscle growth
+
+**Timeline:** Noticeable changes in 4-6 weeks, significant results in 3-6 months!`;
   }
   
   // Motivation
-  if (lowerPrompt.includes('motivation') || lowerPrompt.includes('tired') || lowerPrompt.includes('lazy')) {
-    return "I understand motivation can be tough! Remember: You don't have to feel motivated to take action. Start small - even 10 minutes counts. Focus on how you feel AFTER exercise, not before. You're building a stronger, healthier version of yourself. Every workout is a victory! 🌟";
+  if (lowerPrompt.includes('motivation') || lowerPrompt.includes('tired') || lowerPrompt.includes('lazy') || lowerPrompt.includes('give up')) {
+    return `**Motivation & Mindset Boost:**
+
+**Mindset Shifts:**
+• Progress over perfection - Small steps lead to big changes
+• Identity shift - "I am someone who exercises" vs "I'm trying to exercise"
+• Process goals - Focus on actions, not just outcomes
+• Self-compassion - One bad day doesn't ruin everything
+
+**Practical Strategies:**
+• Start small - 10 minutes is better than 0 minutes
+• Schedule it - Treat workouts like important appointments
+• Find your why - Connect fitness to your deeper values
+• Track wins - Celebrate every small victory
+
+**Energy Boosters:**
+• Morning workouts - Get it done before life gets busy
+• Workout buddy - Accountability makes it easier
+• Playlist power - Music can increase performance by 15%
+• Reward system - Treat yourself for consistency
+
+Remember: You're stronger than your excuses!`;
   }
   
   // General greeting
   if (lowerPrompt.includes('hi') || lowerPrompt.includes('hello') || lowerPrompt.includes('hey')) {
-    return "Hello! I'm your AI fitness coach at FitMate! 👋 I'm here to help you with workouts, nutrition, motivation, and reaching your fitness goals. What would you like to know about today? Whether it's exercise form, meal planning, or staying motivated - I've got you covered! 💪";
+    return `**Welcome to FitMate AI Coach!**
+
+I'm here to help you crush your fitness goals! I can assist with:
+
+**Workout Planning** - Custom routines for any fitness level
+**Nutrition Guidance** - Meal planning and macro advice  
+**Progress Tracking** - Form tips and technique improvement
+**Motivation** - Mindset coaching and habit building
+**Goal Setting** - Realistic timelines and strategies
+
+**Popular Questions:**
+• "Create a workout plan for beginners"
+• "Best exercises for abs"
+• "Post-workout meal suggestions"
+• "How to improve my squat form"
+• "Help me stay motivated"
+
+What fitness goal can I help you achieve today?`;
   }
   
   // Default response
-  return "That's a great fitness question! While I'm having some technical difficulties with my advanced AI features, I can still help you with general fitness advice. Remember: consistency is key, proper form prevents injury, and small progress is still progress. What specific aspect of fitness would you like to focus on? 🏋️‍♂️";
+  return `**Great Fitness Question!**
+
+I'd love to give you a more specific answer! Here are some ways I can help:
+
+**Workout Related:** "Create a workout plan", "Best exercises for [body part]", "How to improve form"
+**Nutrition:** "Post-workout meals", "Weight loss diet", "Muscle building nutrition"
+**Goals:** "Lose weight", "Build muscle", "Get stronger", "Improve endurance"
+**Motivation:** "Stay motivated", "Build habits", "Overcome plateaus"
+
+**General Fitness Principles:**
+• Consistency beats perfection
+• Progressive overload drives results  
+• Recovery is when you actually grow
+• Nutrition is 70% of your results
+
+What specific aspect of fitness would you like to dive deeper into?`;
 };
 
 // Helper function for fitness coaching
