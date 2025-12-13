@@ -115,7 +115,43 @@
   }
 
   .floating-chat-btn {
-    @apply fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-transform duration-200 hover:scale-110 z-50;
+    @apply w-16 h-16 rounded-full text-white shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 border-4 border-white;
+    background: linear-gradient(135deg, #ff4444, #ff6b6b) !important;
+    box-shadow: 0 8px 32px rgba(255, 68, 68, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.5) !important;
+  }
+  
+  .floating-chat-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  .floating-chat-btn::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulse-ring 2s infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
   }
 }
 

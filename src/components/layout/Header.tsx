@@ -66,7 +66,7 @@ const Header = ({ title, subtitle, showBanner = false }: HeaderProps) => {
           </Button>
           <Avatar className="w-10 h-10 bg-primary">
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {getInitials(user?.name, user?.email)}
+              FM
             </AvatarFallback>
           </Avatar>
         </div>

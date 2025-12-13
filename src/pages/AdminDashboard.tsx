@@ -1,60 +1,82 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Users, TrendingUp, Star, AlertCircle, MessageSquare, CheckCircle2 } from "lucide-react";
+import { LogOut, Users, TrendingUp, Star, AlertCircle, MessageSquare, CheckCircle2, Key, Database, Bot, QrCode, UserCheck, BarChart3, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
-interface Feedback {
-  id: string;
-  userId: string;
-  userName: string;
-  date: string;
-  comment: string;
-  rating: number;
-  category: string;
-  status: "pending" | "reviewed" | "resolved";
-}
+import { checkEnvironmentVariables, testSupabaseConnection, testGeminiConnection } from "@/utils/testKeys";
+import { useFeedbackSystem } from "@/hooks/useFeedbackSystem";
+import { useMemberSystem } from "@/hooks/useMemberSystem";
+import { useCheckInSystem } from "@/hooks/useCheckInSystem";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const { 
+    feedbacks, 
+    markAsReviewed, 
+    markAsResolved, 
+    getFeedbackStats 
+  } = useFeedbackSystem();
+  
+  const { getMemberStats } = useMemberSystem();
+  const { crowdStats } = useCheckInSystem();
+  
+  const [apiStatus, setApiStatus] = useState({
+    supabase: { configured: false, connected: false, message: '' },
+    gemini: { configured: false, connected: false, message: '' }
+  });
 
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([
-    {
-      id: "1",
-      userId: "USER001",
-      userName: "John Doe",
-      date: "11/18/2025",
-      comment: "Love the new dumbbells! Great quality.",
-      rating: 5,
-      category: "Equipment",
-      status: "reviewed",
-    },
-    {
-      id: "2",
-      userId: "USER002",
-      userName: "Jane Smith",
-      date: "11/18/2025",
-      comment: "Bathroom could be cleaner. AC not working well.",
-      rating: 3,
-      category: "Facility",
-      status: "pending",
-    },
-    {
-      id: "3",
-      userId: "USER003",
-      userName: "Mike Johnson",
-      date: "11/17/2025",
-      comment: "Excellent trainers and facilities!",
-      rating: 5,
-      category: "Service",
-      status: "reviewed",
-    },
-  ]);
+  const feedbackStats = getFeedbackStats();
+  const memberStats = getMemberStats();
+
+  useEffect(() => {
+    const checkAPIs = async () => {
+      const envCheck = checkEnvironmentVariables();
+      
+      // Test Supabase
+      const supabaseTest = await testSupabaseConnection();
+      setApiStatus(prev => ({
+        ...prev,
+        supabase: {
+          configured: envCheck.supabase,
+          connected: supabaseTest.success,
+          message: supabaseTest.message
+        }
+      }));
+      
+      // Test Gemini
+      if (envCheck.gemini) {
+        const geminiTest = await testGeminiConnection();
+        setApiStatus(prev => ({
+          ...prev,
+          gemini: {
+            configured: envCheck.gemini,
+            connected: geminiTest.success,
+            message: geminiTest.message
+          }
+        }));
+      } else {
+        setApiStatus(prev => ({
+          ...prev,
+          gemini: {
+            configured: false,
+            connected: false,
+            message: 'API key not configured'
+          }
+        }));
+      }
+    };
+    
+    checkAPIs();
+  }, []);
+
+
 
   const handleLogout = () => {
     logout();
@@ -66,9 +88,7 @@ const AdminDashboard = () => {
   };
 
   const handleMarkReviewed = (id: string) => {
-    setFeedbacks((prev) =>
-      prev.map((fb) => (fb.id === id ? { ...fb, status: "reviewed" as const } : fb))
-    );
+    markAsReviewed(id);
     toast({
       title: "Feedback updated",
       description: "Feedback has been marked as reviewed.",
@@ -76,19 +96,12 @@ const AdminDashboard = () => {
   };
 
   const handleResolve = (id: string) => {
-    setFeedbacks((prev) =>
-      prev.map((fb) => (fb.id === id ? { ...fb, status: "resolved" as const } : fb))
-    );
+    markAsResolved(id);
     toast({
       title: "Feedback resolved",
       description: "Feedback has been marked as resolved.",
     });
   };
-
-  const currentMembers = 12;
-  const totalMembers = 285;
-  const avgRating = 4.2;
-  const pendingFeedback = feedbacks.filter((f) => f.status === "pending").length;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -135,17 +148,149 @@ const AdminDashboard = () => {
       </header>
 
       <div className="p-6 space-y-6">
+        {/* API Status Cards */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Key className="w-5 h-5" />
+                <CardTitle>API Configuration Status</CardTitle>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.reload()}
+              >
+                Refresh Status
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Supabase Status */}
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4" />
+                    <span className="font-medium">Supabase</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {apiStatus.supabase.configured ? (
+                      <Badge className="bg-green-500/10 text-green-700">Configured</Badge>
+                    ) : (
+                      <Badge className="bg-red-500/10 text-red-700">Not Configured</Badge>
+                    )}
+                    {apiStatus.supabase.connected ? (
+                      <Badge className="bg-green-500/10 text-green-700">Connected</Badge>
+                    ) : (
+                      <Badge className="bg-red-500/10 text-red-700">Disconnected</Badge>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">{apiStatus.supabase.message}</p>
+              </div>
+
+              {/* Gemini Status */}
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-4 h-4" />
+                    <span className="font-medium">Gemini AI</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {apiStatus.gemini.configured ? (
+                      <Badge className="bg-green-500/10 text-green-700">Configured</Badge>
+                    ) : (
+                      <Badge className="bg-red-500/10 text-red-700">Not Configured</Badge>
+                    )}
+                    {apiStatus.gemini.connected ? (
+                      <Badge className="bg-green-500/10 text-green-700">Connected</Badge>
+                    ) : (
+                      <Badge className="bg-red-500/10 text-red-700">Disconnected</Badge>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">{apiStatus.gemini.message}</p>
+              </div>
+            </div>
+            
+            {(!apiStatus.supabase.configured || !apiStatus.gemini.configured) && (
+              <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                  ⚠️ Some APIs are not configured. Check your .env file and refer to SETUP.md for configuration instructions.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link to="/admin/checkins">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <QrCode className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Check-In Management</h3>
+                  <p className="text-sm text-muted-foreground">Monitor gym occupancy</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Member Management</h3>
+                <p className="text-sm text-muted-foreground">{memberStats.totalMembers} total members</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Analytics Dashboard</h3>
+                <p className="text-sm text-muted-foreground">View detailed reports</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                <Settings className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">System Settings</h3>
+                <p className="text-sm text-muted-foreground">Configure gym settings</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Current Members
+                Current Occupancy
               </CardTitle>
               <Users className="w-4 h-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{currentMembers}/50</div>
+              <div className="text-2xl font-bold">{crowdStats.currentCount}/{crowdStats.maxCapacity}</div>
+              <p className="text-xs text-muted-foreground">
+                {crowdStats.percentage}% capacity
+              </p>
             </CardContent>
           </Card>
 
@@ -157,7 +302,10 @@ const AdminDashboard = () => {
               <TrendingUp className="w-4 h-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalMembers}</div>
+              <div className="text-2xl font-bold">{memberStats.totalMembers}</div>
+              <p className="text-xs text-muted-foreground">
+                {memberStats.newMembersThisMonth} new this month
+              </p>
             </CardContent>
           </Card>
 
@@ -167,7 +315,10 @@ const AdminDashboard = () => {
               <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{avgRating}/5</div>
+              <div className="text-2xl font-bold">{feedbackStats.averageRating}/5</div>
+              <p className="text-xs text-muted-foreground">
+                From {feedbackStats.totalFeedback} reviews
+              </p>
             </CardContent>
           </Card>
 
@@ -179,7 +330,10 @@ const AdminDashboard = () => {
               <AlertCircle className="w-4 h-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{pendingFeedback}</div>
+              <div className="text-2xl font-bold">{feedbackStats.pendingFeedback}</div>
+              <p className="text-xs text-muted-foreground">
+                {feedbackStats.resolvedFeedback} resolved
+              </p>
             </CardContent>
           </Card>
         </div>

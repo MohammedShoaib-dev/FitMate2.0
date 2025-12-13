@@ -7,8 +7,10 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleSelection from "./pages/RoleSelection";
 import UserLogin from "./pages/UserLogin";
+import UserSignup from "./pages/UserSignup";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import CheckInManagement from "./pages/CheckInManagement";
 import Index from "./pages/Index";
 import Workouts from "./pages/Workouts";
 import Nutrition from "./pages/Nutrition";
@@ -30,6 +32,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/login" element={<RoleSelection />} />
             <Route path="/login/user" element={<UserLogin />} />
+            <Route path="/signup" element={<UserSignup />} />
             <Route path="/login/admin" element={<AdminLogin />} />
 
             {/* Protected user routes */}
@@ -96,6 +99,14 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/checkins"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CheckInManagement />
                 </ProtectedRoute>
               }
             />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Send, Bot, Sparkles } from "lucide-react";
+import { getFitnessAdvice } from "@/lib/gemini";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,7 @@ const AICoach = () => {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const messageText = text || input;
     if (!messageText.trim()) return;
 
@@ -46,8 +47,22 @@ const AICoach = () => {
     setInput("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      // Try to get AI response from Gemini
+      const aiResponse = await getFitnessAdvice(messageText);
+      
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: aiResponse,
+        isBot: true,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('AI response error:', error);
+      
+      // Fallback to predefined responses
       const responses: Record<string, string> = {
         "Create a workout plan":
           "Great! Based on your goals, I recommend a 4-day split:\n\n📅 **Monday**: Chest & Triceps\n📅 **Tuesday**: Back & Biceps\n📅 **Wednesday**: Rest\n📅 **Thursday**: Legs\n📅 **Friday**: Shoulders & Core\n\nWould you like me to detail the exercises for each day?",
@@ -70,14 +85,16 @@ const AICoach = () => {
         id: (Date.now() + 1).toString(),
         text:
           responses[messageText] ||
-          defaultResponses[Math.floor(Math.random() * defaultResponses.length)],
+          defaultResponses[Math.floor(Math.random() * defaultResponses.length)] +
+          "\n\n⚠️ Note: AI features require API configuration.",
         isBot: true,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (

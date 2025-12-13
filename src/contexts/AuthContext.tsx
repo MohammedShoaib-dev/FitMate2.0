@@ -11,10 +11,11 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: "user" | "admin") => boolean;
-  logout: () => void;
+  login: (email: string, password: string, role: "user" | "admin") => Promise<boolean>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,42 +40,112 @@ const DEMO_CREDENTIALS = {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    // Check localStorage on mount
-    const stored = localStorage.getItem("fitmate_user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Save to localStorage whenever user changes
-    if (user) {
-      localStorage.setItem("fitmate_user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("fitmate_user");
-    }
-  }, [user]);
+    // Simple and fast session check - localStorage only
+    const checkSession = () => {
+      try {
+        const stored = localStorage.getItem("fitmate_user");
+        if (stored) {
+          setUser(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Error checking stored session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const login = (email: string, password: string, role: "user" | "admin"): boolean => {
+    // Run immediately for fast loading
+    checkSession();
+  }, []);
+
+  const login = async (email: string, password: string, role: "user" | "admin"): Promise<boolean> => {
+    // Check demo credentials first (synchronous and instant)
     const credentials = DEMO_CREDENTIALS[role];
-    const foundUser = credentials.find(
+    const foundDemoUser = credentials.find(
       (cred) => cred.email.toLowerCase() === email.toLowerCase() && cred.password === password
     );
 
-    if (foundUser) {
-      setUser({
-        id: foundUser.id,
-        email: foundUser.email,
+    if (foundDemoUser) {
+      const userData = {
+        id: foundDemoUser.id,
+        email: foundDemoUser.email,
         role,
-        name: foundUser.name,
-      });
+        name: foundDemoUser.name,
+      };
+      setUser(userData);
+      localStorage.setItem("fitmate_user", JSON.stringify(userData));
       return true;
     }
+
+    // Check for demo user created during signup
+    try {
+      const demoUser = localStorage.getItem("fitmate_demo_user");
+      if (demoUser) {
+        const parsedDemoUser = JSON.parse(demoUser);
+        if (parsedDemoUser.email.toLowerCase() === email.toLowerCase() && role === parsedDemoUser.role) {
+          setUser(parsedDemoUser);
+          localStorage.setItem("fitmate_user", JSON.stringify(parsedDemoUser));
+          return true;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking demo user:', error);
+    }
+
+    // Only try Supabase for non-demo emails (with short timeout)
+    if (!email.includes('fitmate.com')) {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (error) throw error;
+
+        if (data.user && data.user.email) {
+          const userData = {
+            id: data.user.id,
+            email: data.user.email,
+            role: role,
+            name: data.user.user_metadata?.name || data.user.email.split('@')[0],
+          };
+          setUser(userData);
+          localStorage.setItem("fitmate_user", JSON.stringify(userData));
+          return true;
+        }
+      } catch (error) {
+        console.error('Supabase login failed:', error);
+      }
+    }
+
     return false;
   };
 
-  const logout = () => {
+  const logout = async (): Promise<void> => {
+    // For demo mode, just clear local state
     setUser(null);
     localStorage.removeItem("fitmate_user");
+    localStorage.removeItem("fitmate_demo_user");
+    
+    // Only try Supabase signout if user might be a real Supabase user
+    if (user && !user.id.startsWith('USER') && !user.id.startsWith('ADMIN')) {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error('Error signing out from Supabase:', error);
+      }
+    }
   };
 
   return (
@@ -85,6 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         isAuthenticated: !!user,
         isAdmin: user?.role === "admin",
+        loading,
       }}
     >
       {children}

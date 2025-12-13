@@ -3,6 +3,7 @@ import { Sparkles, QrCode } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
 import CrowdTracker from "@/components/CrowdTracker";
 import TodayPlan from "@/components/TodayPlan";
+import ProgressWidget from "@/components/ProgressWidget";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
@@ -16,12 +17,7 @@ const Index = () => {
         </div>
 
         {/* Crowd Tracker */}
-        <CrowdTracker
-          status="moderate"
-          percentage={65}
-          currentCount={32}
-          maxCapacity={50}
-        />
+        <CrowdTracker showQRScanner={true} showRecentActivity={true} />
 
         {/* QR Check-In Card */}
         <div className="bg-card rounded-xl p-5 shadow-sm animate-slide-up">
@@ -73,6 +69,9 @@ const Index = () => {
             dinner: "Salmon with quinoa & vegetables",
           }}
         />
+
+        {/* Progress Widget */}
+        <ProgressWidget compact />
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-3 animate-slide-up">

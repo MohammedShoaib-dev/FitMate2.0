@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Clock, Flame, Trash2, Dumbbell, Sparkles, CheckCircle, CalendarDays, User, Users } from "lucide-react";
+import { Plus, Clock, Flame, Trash2, Dumbbell, Sparkles, CheckCircle, CalendarDays, User, Users, Play, TrendingUp } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
 import StatCard from "@/components/StatCard";
 import { Button } from "@/components/ui/button";
@@ -7,135 +7,57 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-
-interface Workout {
-  id: string;
-  name: string;
-  date: string;
-  duration: number;
-  calories: number;
-  notes?: string;
-}
-
-interface AvailableWorkout {
-  id: string;
-  name: string;
-  level: "Beginner" | "Intermediate" | "Advanced";
-  category: string;
-  duration: number;
-  calories: number;
-  isAIPick?: boolean;
-}
-
-interface GymClass {
-  id: string;
-  name: string;
-  instructor: string;
-  time: string;
-  duration: string;
-  spotsLeft: number;
-  totalSpots: number;
-  category: string;
-}
+import { useWorkoutSystem } from "@/hooks/useWorkoutSystem";
+import { useBookingSystem } from "@/hooks/useBookingSystem";
+import WorkoutLogger from "@/components/WorkoutLogger";
+import ClassBooking from "@/components/ClassBooking";
 
 const Workouts = () => {
-  const [completedWorkouts, setCompletedWorkouts] = useState<Workout[]>([
-    {
-      id: "1",
-      name: "Morning Jog",
-      date: "11/18/2025",
-      duration: 30,
-      calories: 350,
-      notes: "Felt great!",
-    },
-  ]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isWorkoutLoggerOpen, setIsWorkoutLoggerOpen] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | undefined>();
+  const [isClassBookingOpen, setIsClassBookingOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState<any>(null);
+  
   const { toast } = useToast();
+  const { 
+    completedWorkouts, 
+    deleteWorkout, 
+    getWorkoutStats, 
+    getWorkoutTemplates 
+  } = useWorkoutSystem();
+  
+  const { 
+    getClassesForDate, 
+    bookClass, 
+    isBooking 
+  } = useBookingSystem();
 
-  const availableWorkouts: AvailableWorkout[] = [
-    {
-      id: "a1",
-      name: "Upper Body Strength",
-      level: "Intermediate",
-      category: "Strength",
-      duration: 45,
-      calories: 380,
-      isAIPick: true,
-    },
-    {
-      id: "a2",
-      name: "HIIT Cardio Blast",
-      level: "Advanced",
-      category: "Cardio",
-      duration: 30,
-      calories: 450,
-    },
-    {
-      id: "a3",
-      name: "Yoga Flow",
-      level: "Beginner",
-      category: "Flexibility",
-      duration: 40,
-      calories: 180,
-    },
-  ];
-
-  const classes: GymClass[] = [
-    {
-      id: "1",
-      name: "Morning Yoga",
-      instructor: "Sarah Johnson",
-      time: "7:00 AM",
-      duration: "60 min",
-      spotsLeft: 8,
-      totalSpots: 15,
-      category: "Yoga",
-    },
-    {
-      id: "2",
-      name: "HIIT Blast",
-      instructor: "Mike Chen",
-      time: "9:00 AM",
-      duration: "45 min",
-      spotsLeft: 3,
-      totalSpots: 20,
-      category: "Cardio",
-    },
-    {
-      id: "3",
-      name: "Zumba Dance",
-      instructor: "Maria Garcia",
-      time: "11:00 AM",
-      duration: "50 min",
-      spotsLeft: 12,
-      totalSpots: 25,
-      category: "Dance",
-    },
-    {
-      id: "4",
-      name: "Spin Class",
-      instructor: "James Wilson",
-      time: "5:00 PM",
-      duration: "45 min",
-      spotsLeft: 5,
-      totalSpots: 18,
-      category: "Cardio",
-    },
-  ];
-
-  const totalWorkouts = completedWorkouts.length;
-  const totalCalories = completedWorkouts.reduce((sum, w) => sum + w.calories, 0);
-  const totalMinutes = completedWorkouts.reduce((sum, w) => sum + w.duration, 0);
+  const workoutTemplates = getWorkoutTemplates();
+  const classesForDate = selectedDate ? getClassesForDate(selectedDate) : [];
+  const workoutStats = getWorkoutStats();
 
   const handleDelete = (id: string) => {
-    setCompletedWorkouts(completedWorkouts.filter((w) => w.id !== id));
+    deleteWorkout(id);
+    toast({
+      title: "Workout Deleted",
+      description: "Workout has been removed from your history.",
+    });
   };
 
-  const handleBook = (classItem: GymClass) => {
-    toast({
-      title: "Class Booked! 🎉",
-      description: `You've successfully booked ${classItem.name} with ${classItem.instructor} at ${classItem.time}.`,
-    });
+  const handleBookClass = (gymClass: any) => {
+    setSelectedClass(gymClass);
+    setIsClassBookingOpen(true);
+  };
+
+  const handleStartWorkout = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    setIsWorkoutLoggerOpen(true);
+  };
+
+  const handleLogCustomWorkout = () => {
+    setSelectedTemplateId(undefined);
+    setIsWorkoutLoggerOpen(true);
   };
 
   const levelColors = {
@@ -163,7 +85,7 @@ const Workouts = () => {
             <h1 className="text-2xl font-bold text-foreground">Workouts</h1>
             <p className="text-muted-foreground">Choose a workout or log your own</p>
           </div>
-          <Button className="gap-2">
+          <Button onClick={handleLogCustomWorkout} className="gap-2">
             <Plus className="w-4 h-4" />
             Log Workout
           </Button>
@@ -173,19 +95,19 @@ const Workouts = () => {
         <div className="grid grid-cols-3 gap-3">
           <StatCard
             label="Total Workouts"
-            value={totalWorkouts}
+            value={workoutStats.totalWorkouts}
             variant="blue"
             icon={<Dumbbell className="w-6 h-6" />}
           />
           <StatCard
             label="Total Calories Burned"
-            value={totalCalories}
+            value={workoutStats.totalCalories}
             variant="orange"
             icon={<Flame className="w-6 h-6" />}
           />
           <StatCard
             label="Total Minutes"
-            value={totalMinutes}
+            value={workoutStats.totalMinutes}
             variant="green"
             icon={<Clock className="w-6 h-6" />}
           />
@@ -218,47 +140,55 @@ const Workouts = () => {
             </div>
 
             <div className="space-y-3">
-              {classes.map((classItem) => (
-                <div
-                  key={classItem.id}
-                  className="bg-muted/50 rounded-xl p-3 border border-border"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium text-foreground text-sm">{classItem.name}</h4>
-                        <Badge className={getCategoryColor(classItem.category)} variant="secondary">
-                          {classItem.category}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <User className="w-3 h-3" />
-                        <span>{classItem.instructor}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {classItem.time} • {classItem.duration}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {classItem.spotsLeft} spots
-                      </span>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => handleBook(classItem)}
-                      disabled={classItem.spotsLeft === 0}
-                    >
-                      Book
-                    </Button>
-                  </div>
+              {classesForDate.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CalendarDays className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No classes available for this date</p>
+                  <p className="text-sm">Try selecting a different date</p>
                 </div>
-              ))}
+              ) : (
+                classesForDate.map((classItem) => (
+                  <div
+                    key={classItem.id}
+                    className="bg-muted/50 rounded-xl p-3 border border-border"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium text-foreground text-sm">{classItem.name}</h4>
+                          <Badge className={getCategoryColor(classItem.category)} variant="secondary">
+                            {classItem.category}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <User className="w-3 h-3" />
+                          <span>{classItem.instructor}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {classItem.time} • {classItem.duration}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {classItem.spotsLeft} spots
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => handleBookClass(classItem)}
+                        disabled={classItem.spotsLeft === 0}
+                      >
+                        {classItem.spotsLeft === 0 ? 'Full' : 'Book'}
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -307,17 +237,17 @@ const Workouts = () => {
           </div>
         </div>
 
-        {/* Available Workouts */}
+        {/* Available Workout Templates */}
         <div>
           <h2 className="font-semibold text-foreground mb-3">Available Workouts</h2>
           <div className="space-y-3">
-            {availableWorkouts.map((workout) => (
+            {workoutTemplates.map((workout) => (
               <div
                 key={workout.id}
                 className="bg-card border border-border rounded-xl p-4 shadow-sm"
               >
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-foreground">{workout.name}</h3>
                       {workout.isAIPick && (
@@ -327,6 +257,9 @@ const Workouts = () => {
                         </Badge>
                       )}
                     </div>
+                    {workout.description && (
+                      <p className="text-sm text-muted-foreground mb-2">{workout.description}</p>
+                    )}
                     <div className="flex items-center gap-2 mt-2">
                       <Badge className={cn("font-medium", levelColors[workout.level])}>
                         {workout.level}
@@ -340,15 +273,40 @@ const Workouts = () => {
                       </span>
                       <span className="flex items-center gap-1">
                         <Flame className="w-4 h-4" />
-                        {workout.calories} cal
+                        ~{workout.estimatedCalories} cal
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Dumbbell className="w-4 h-4" />
+                        {workout.exercises.length} exercises
                       </span>
                     </div>
                   </div>
+                  <Button
+                    onClick={() => handleStartWorkout(workout.id)}
+                    className="ml-4 gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Start Workout
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Workout Logger Modal */}
+        <WorkoutLogger
+          isOpen={isWorkoutLoggerOpen}
+          onClose={() => setIsWorkoutLoggerOpen(false)}
+          templateId={selectedTemplateId}
+        />
+
+        {/* Class Booking Modal */}
+        <ClassBooking
+          isOpen={isClassBookingOpen}
+          onClose={() => setIsClassBookingOpen(false)}
+          gymClass={selectedClass}
+        />
       </div>
     </AppLayout>
   );
