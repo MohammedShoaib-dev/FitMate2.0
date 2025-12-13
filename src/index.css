@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 40 33% 98%;
+    --foreground: 200 25% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 25% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 25% 20%;
+
+    --primary: 180 55% 27%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 20% 95%;
+    --secondary-foreground: 200 25% 20%;
+
+    --muted: 40 15% 93%;
+    --muted-foreground: 200 10% 50%;
+
+    --accent: 180 55% 27%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 180 55% 27%;
+
+    --radius: 0.75rem;
+
+    /* Custom FitMate colors */
+    --stat-blue: 210 80% 55%;
+    --stat-green: 160 60% 45%;
+    --stat-orange: 25 95% 55%;
+    --stat-red: 0 72% 55%;
+    --stat-teal: 180 55% 40%;
+
+    /* Gradients */
+    --gradient-header: linear-gradient(135deg, hsl(180 55% 27%) 0%, hsl(180 45% 35%) 100%);
+  }
+
+  .dark {
+    --background: 200 25% 10%;
+    --foreground: 40 33% 98%;
+
+    --card: 200 20% 15%;
+    --card-foreground: 40 33% 98%;
+
+    --popover: 200 20% 15%;
+    --popover-foreground: 40 33% 98%;
+
+    --primary: 180 50% 45%;
+    --primary-foreground: 200 25% 10%;
+
+    --secondary: 200 15% 20%;
+    --secondary-foreground: 40 33% 98%;
+
+    --muted: 200 15% 25%;
+    --muted-foreground: 40 15% 65%;
+
+    --accent: 180 50% 45%;
+    --accent-foreground: 200 25% 10%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 15% 25%;
+    --input: 200 15% 25%;
+    --ring: 180 50% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-card rounded-xl p-4 shadow-sm border-l-4 transition-all duration-200 hover:shadow-md;
+  }
+
+  .stat-card-blue {
+    @apply border-l-stat-blue;
+  }
+
+  .stat-card-green {
+    @apply border-l-stat-green;
+  }
+
+  .stat-card-orange {
+    @apply border-l-stat-orange;
+  }
+
+  .stat-card-red {
+    @apply border-l-stat-red;
+  }
+
+  .header-gradient {
+    background: var(--gradient-header);
+  }
+
+  .floating-chat-btn {
+    @apply fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center transition-transform duration-200 hover:scale-110 z-50;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2s infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+}
