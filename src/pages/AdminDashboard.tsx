@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { checkEnvironmentVariables, testSupabaseConnection, testGeminiConnection } from "@/utils/testKeys";
-import { useFeedbackSystem } from "@/hooks/useFeedbackSystem";
+import { useFeedback } from "@/contexts/FeedbackContext";
 import { useMemberSystem } from "@/hooks/useMemberSystem";
 import { useCheckInSystem } from "@/hooks/useCheckInSystem";
 import { Link } from "react-router-dom";
@@ -22,7 +22,9 @@ const AdminDashboard = () => {
     markAsReviewed, 
     markAsResolved, 
     getFeedbackStats 
-  } = useFeedbackSystem();
+  } = useFeedback();
+  
+  console.log('🔍 AdminDashboard - Current feedbacks:', feedbacks?.length || 0);
   
   const { getMemberStats } = useMemberSystem();
   const { crowdStats } = useCheckInSystem();
@@ -34,6 +36,8 @@ const AdminDashboard = () => {
 
   const feedbackStats = getFeedbackStats();
   const memberStats = getMemberStats();
+
+
 
   useEffect(() => {
     const checkAPIs = async () => {
@@ -159,7 +163,48 @@ const AdminDashboard = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.reload()}
+                onClick={async () => {
+                  console.log('🔄 Manually refreshing API status...');
+                  const envCheck = checkEnvironmentVariables();
+                  
+                  // Test Supabase
+                  const supabaseTest = await testSupabaseConnection();
+                  setApiStatus(prev => ({
+                    ...prev,
+                    supabase: {
+                      configured: envCheck.supabase,
+                      connected: supabaseTest.success,
+                      message: supabaseTest.message
+                    }
+                  }));
+                  
+                  // Test Gemini
+                  if (envCheck.gemini) {
+                    const geminiTest = await testGeminiConnection();
+                    setApiStatus(prev => ({
+                      ...prev,
+                      gemini: {
+                        configured: envCheck.gemini,
+                        connected: geminiTest.success,
+                        message: geminiTest.message
+                      }
+                    }));
+                  } else {
+                    setApiStatus(prev => ({
+                      ...prev,
+                      gemini: {
+                        configured: false,
+                        connected: false,
+                        message: 'API key not configured'
+                      }
+                    }));
+                  }
+                  
+                  toast({
+                    title: "API Status Refreshed",
+                    description: "Check the console for detailed test results.",
+                  });
+                }}
               >
                 Refresh Status
               </Button>
@@ -346,11 +391,18 @@ const AdminDashboard = () => {
                 <MessageSquare className="w-5 h-5" />
                 <CardTitle>Member Feedback</CardTitle>
               </div>
-              <span className="text-sm text-muted-foreground">{feedbacks.length} total feedback</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{feedbacks?.length || 0} total feedback</span>
+                <Badge variant="outline" className="text-xs">
+                  {feedbacks ? 'Loaded' : 'Loading...'}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {feedbacks.map((feedback) => (
+
+            {feedbacks && feedbacks.length > 0 ? (
+              feedbacks.map((feedback) => (
               <div
                 key={feedback.id}
                 className="p-4 border rounded-lg space-y-3 hover:bg-muted/50 transition-colors"
@@ -390,7 +442,14 @@ const AdminDashboard = () => {
                   </Button>
                 </div>
               </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No feedback data available</p>
+                <p className="text-sm">Feedback count: {feedbacks?.length || 0}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
