@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sparkles, Dumbbell, Apple, Clock, Flame, Utensils } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,11 @@ interface Meal {
 
 const Nutrition = () => {
   const [activeTab, setActiveTab] = useState("workout");
+  const navigate = useNavigate();
+
+  const handleGenerateNewPlan = () => {
+    navigate("/ai-coach");
+  };
 
   const weeklyWorkout: WorkoutDay[] = [
     { day: "Monday", focus: "Chest & Triceps", exercises: ["Bench Press", "Incline Dumbbell Press", "Tricep Dips"] },
@@ -108,7 +114,7 @@ const Nutrition = () => {
           <TabsContent value="workout" className="space-y-4 mt-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold text-foreground">Weekly Workout Plan</h2>
-              <Button size="sm" className="gap-2">
+              <Button size="sm" className="gap-2" onClick={handleGenerateNewPlan}>
                 <Sparkles className="w-4 h-4" />
                 Generate New Plan
               </Button>
