@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import QRScanner from "./QRScanner";
-import SimpleQRDemo from "./SimpleQRDemo";
 import { useCheckInSystem } from "@/hooks/useCheckInSystem";
 import { useToast } from "@/hooks/use-toast";
 
@@ -208,7 +207,7 @@ const CrowdTracker = ({ showQRScanner = true, showRecentActivity = true }: Crowd
       )}
 
       {/* QR Scanner Modal */}
-      <SimpleQRDemo
+      <QRScanner
         isOpen={isQRScannerOpen}
         onClose={() => setIsQRScannerOpen(false)}
         onScan={handleQRScan}
