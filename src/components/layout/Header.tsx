@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import Logo from "@/components/ui/Logo";
 
 interface HeaderProps {
   title?: string;
@@ -44,11 +45,8 @@ const Header = ({ title, subtitle, showBanner = false }: HeaderProps) => {
     <header className="sticky top-0 z-40">
       {/* Main header */}
       <div className="bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Dumbbell className="w-5 h-5 text-primary" />
-          </div>
-          <span className="text-lg font-bold text-foreground">FitMate</span>
+        <div className="flex items-center">
+          <Logo size="sm" showText={true} />
         </div>
         <div className="flex items-center gap-3">
           {isAdmin && (

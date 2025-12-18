@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import Logo from "@/components/ui/Logo";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -52,8 +53,8 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-2">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Lock className="w-8 h-8 text-primary" />
+          <div className="flex justify-center">
+            <Logo size="lg" showText={true} />
           </div>
           <div>
             <CardTitle className="text-2xl">Admin Portal</CardTitle>
