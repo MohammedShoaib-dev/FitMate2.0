@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import Logo from "@/components/ui/Logo";
 
 const UserSignup = () => {
   const navigate = useNavigate();
@@ -154,8 +155,8 @@ const UserSignup = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-2">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Dumbbell className="w-8 h-8 text-primary" />
+          <div className="flex justify-center">
+            <Logo size="lg" showText={true} />
           </div>
           <div>
             <CardTitle className="text-2xl">Join FitMate</CardTitle>
