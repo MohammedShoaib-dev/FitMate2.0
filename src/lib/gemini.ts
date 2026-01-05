@@ -20,7 +20,7 @@ try {
   genAI = new GoogleGenerativeAI(apiKey);
   
   geminiModel = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     generationConfig: {
       temperature: 0.7,
       topP: 0.8,
@@ -275,7 +275,7 @@ const getSmartFitnessResponse = (prompt: string): string => {
   }
   
   // Weight loss
-  if (lowerPrompt.includes('lose weight') || lowerPrompt.includes('fat loss') || lowerPrompt.includes('cutting') || lowerPrompt.includes('weight loss')) {
+  if (lowerPrompt.includes('lose weight') || lowerPrompt.includes('loose weight') || lowerPrompt.includes('fat loss') || lowerPrompt.includes('cutting') || lowerPrompt.includes('weight loss')) {
     return `**Effective Weight Loss Strategy:**
 
 **Calorie Management:**
@@ -295,6 +295,128 @@ const getSmartFitnessResponse = (prompt: string): string => {
 • Patience: 1-2 lbs per week is healthy and sustainable
 
 **Remember:** It's a marathon, not a sprint!`;
+  }
+  
+  // Strength training
+  if (lowerPrompt.includes('get stronger') || lowerPrompt.includes('strength') || lowerPrompt.includes('strong')) {
+    return `**Get Stronger - Strength Training Guide:**
+
+**Progressive Overload Principles:**
+• Increase weight by 2.5-5lbs when you can complete all sets/reps
+• Focus on compound movements (squat, deadlift, bench, row)
+• Train 3-4x per week with 48-72 hours rest between sessions
+• Track your lifts to monitor progress
+
+**Strength Building Program:**
+• Week 1-2: 3 sets x 8-10 reps at 70-75% max effort
+• Week 3-4: 4 sets x 6-8 reps at 75-80% max effort  
+• Week 5-6: 5 sets x 4-6 reps at 80-85% max effort
+• Week 7: Deload - reduce weight by 10-15%
+
+**Key Exercises for Strength:**
+• Squats: King of lower body strength
+• Deadlifts: Full body power and posterior chain
+• Bench Press: Upper body pushing strength
+• Overhead Press: Shoulder and core strength
+• Pull-ups/Rows: Upper body pulling strength
+
+**Nutrition for Strength:**
+• Eat in slight calorie surplus (200-300 calories)
+• Protein: 1g per lb bodyweight minimum
+• Carbs: Fuel your workouts (2-3g per lb bodyweight)
+• Sleep: 7-9 hours for recovery and strength gains
+
+**Timeline:** Strength gains visible in 2-4 weeks, significant improvements in 8-12 weeks!`;
+  }
+
+  // Chest exercises
+  if (lowerPrompt.includes('chest press') || lowerPrompt.includes('bench press') || lowerPrompt.includes('chest workout') || lowerPrompt.includes('chest exercise')) {
+    return `**Perfect Chest Press Technique:**
+
+**Bench Press Setup:**
+• Lie flat on bench, feet firmly on floor
+• Grip bar slightly wider than shoulder-width
+• Retract shoulder blades, create slight arch in lower back
+• Bar should be over your chest/nipple line
+
+**Movement Execution:**
+• Unrack bar and position over chest
+• Lower bar slowly (2-3 seconds) to chest
+• Touch chest lightly, don't bounce
+• Press up explosively, driving through heels
+• Keep elbows at 45-degree angle to body
+
+**Common Mistakes to Avoid:**
+• Flaring elbows too wide (90 degrees)
+• Bouncing bar off chest
+• Lifting feet off ground
+• Arching back excessively
+• Not using full range of motion
+
+**Progression Options:**
+• Beginner: Push-ups → Incline bench → Flat bench
+• Intermediate: Add weight gradually (2.5-5lbs per week)
+• Advanced: Pause reps, tempo variations, different angles
+
+**Safety Tips:**
+• Always use a spotter for heavy weights
+• Start light and focus on form first
+• Warm up with lighter weights
+• Don't train chest more than 2-3x per week
+
+**Rep Ranges:**
+• Strength: 3-5 reps at 85-90% max
+• Muscle Building: 6-12 reps at 70-80% max
+• Endurance: 12-20 reps at 60-70% max`;
+  }
+
+  // Dumbbell form
+  if (lowerPrompt.includes('dumble') || lowerPrompt.includes('dumbbell') || lowerPrompt.includes('proper form')) {
+    return `**Perfect Dumbbell Form Guide:**
+
+**General Dumbbell Principles:**
+• Start with lighter weights to master form
+• Control the weight through full range of motion
+• Keep core engaged throughout all movements
+• Breathe out on exertion, in on the negative
+
+**Common Dumbbell Exercises & Form:**
+
+**Dumbbell Chest Press:**
+• Lie on bench, dumbbells at chest level
+• Press up and slightly inward (dumbbells almost touch at top)
+• Lower with control until slight stretch in chest
+• Keep wrists straight and strong
+
+**Dumbbell Rows:**
+• Hinge at hips, keep back straight
+• Pull dumbbells to lower ribs/upper abs
+• Squeeze shoulder blades together at top
+• Don't let shoulders round forward
+
+**Dumbbell Shoulder Press:**
+• Start with dumbbells at shoulder height
+• Press straight up, not forward
+• Don't arch back excessively
+• Lower with control to ear level
+
+**Dumbbell Squats:**
+• Hold dumbbells at sides or shoulders
+• Feet shoulder-width apart
+• Sit back like sitting in chair
+• Keep chest up, knees track over toes
+
+**Form Check Tips:**
+• Use mirrors to check your form
+• Start with bodyweight, then add dumbbells
+• Focus on feeling the target muscles working
+• If form breaks down, reduce weight immediately
+
+**Progressive Overload:**
+• Week 1-2: Master movement pattern
+• Week 3-4: Increase weight by 2.5-5lbs
+• Week 5-6: Add more reps or sets
+• Always prioritize form over heavy weight!`;
   }
   
   // Muscle building
